@@ -1,6 +1,7 @@
 name = "lingering-brook-a115"                # replace with your worker name
 type = "javascript"
 workers_dev = true
+compatibility_date = "2025-10-23"
 
 [build]
 command = "npm ci && npm run build"
@@ -9,3 +10,6 @@ command = "npm ci && npm run build"
 format = "modules"
 main = "./index.mjs"
 dir = "./dist"
+
+[assets]
+directory = "./dist"
