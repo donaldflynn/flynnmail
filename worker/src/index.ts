@@ -1,5 +1,18 @@
 import PostalMime from "postal-mime";
 import { convert } from "html-to-text";
+import type { D1Database, ExecutionContext } from "@cloudflare/workers-types";
+
+type EmailRow = {
+    id: string;
+    from: string;
+    to: string;
+    body: string;
+    timestamp: number;
+};
+
+type Env = {
+  DB: D1Database; // change if your binding name differs
+};
 
 const parseContent = (text?: string, html?: string): string | null => {
   // Extract body (prefer plain text, fallback to HTML conversion)
@@ -16,70 +29,38 @@ const parseContent = (text?: string, html?: string): string | null => {
 };
 
 export default {
-  async email(message, env, ctx) {
+  async email(message: any, env: Env, ctx: ExecutionContext) {
     try {
-      // Parse email with base64 encoding for attachments
+      // parse raw email (attachments base64)
       const email = await PostalMime.parse(message.raw, {
         attachmentEncoding: "base64",
       });
 
-      let body = parseContent(email.text, email.html);
+      // headers: from/to may be arrays or single values
+      const fromAdress = email.from?.address ?? "";
+      const toAddress = Array.isArray(email.to) ? (email.to[0]?.address ?? "") : (email.to ?? "");
 
-      // Prepare payload for the API
-      const payload = JSON.stringify({
-        subject: email.subject,
-        name: email.from?.name,
-        email: email.from?.address,
-        message: body,
-        source: "email",
-        reply_to: message.to,
-        message_id: email.messageId,
-        attachments: email.attachments.map((attachment) => ({
-          filename: attachment.filename || "unnamed_attachment",
-          mimeType: attachment.mimeType || "application/octet-stream",
-          content: attachment.content, // Already a base64 string due to attachmentEncoding
-        })),
-      });
+      const body = parseContent(email.text, email.html);
+      const timestamp = Date.now();
 
-      // API Call with Basic Authentication
-      const apiResponse = await fetch("https://example.com/api/tickets", {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          Authorization: `Basic ${env.API_KEY}`,
-        },
-        body: payload,
-      });
+      // Insert into D1.
+      // NOTE: "from" and "to" are reserved words; we quote them.
+      // Adjust table name "emails" if necessary.
+      const stmt = env.DB.prepare(`
+        INSERT INTO emails ("from","to","body","timestamp")
+        VALUES (?, ?, ?, ?)
+      `);
 
-      // Check API response
-      if (!apiResponse.ok) {
-        console.error("API Call Failed. Status:", apiResponse.status);
-        const errorText = await apiResponse.text();
-        console.error("Error Response Body:", errorText);
-        message.setReject("Failed to process email.");
-      } else {
-        console.log("Email processed and forwarded to API.");
-      }
-    } catch (error) {
-      console.error("Failed to process email:", error);
-      message.setReject("Failed to process email.");
+      // bind params, then run
+      const res = await stmt.bind(fromAdress, toAddress, body, timestamp).run();
+      // if your runtime requires an array: await env.DB.prepare(sql).run([from, to, body, timestamp]);
+
+      // optional: check res for lastInsertRowid or changes
+        return new Response("ok", { status: 200 });
+      } catch (err) {
+      // log for debugging
+      console.error("email handler error", err);
+      return new Response("error", { status: 500 });
     }
   },
-} satisfies ExportedHandler<Env>;
-
-// type OrderRow = {
-//     Id: string;
-//     CustomerName: string;
-//     OrderDate: number;
-// };
-// export default {
-//   async fetch(request, env) {
-//     const result = await env.MY_DB.prepare(
-//         "SELECT Id, CustomerName, OrderDate FROM [Order] ORDER BY ShippedDate DESC LIMIT 100",
-//     ).run<OrderRow>();
-//     return new Response(JSON.stringify(result));
-//   }
-// }
-
-// test
+};
