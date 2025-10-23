@@ -4,15 +4,11 @@
  */
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "site",
-	"main": "src/index.ts",
+	"name": "flynnmail",
+	"main": "worker/index.ts",
 	"compatibility_date": "2025-10-23",
-	"compatibility_flags": [
-		"global_fetch_strictly_public"
-	],
 	"assets": {
-		// The path to the directory containing the `index.html` file to be served at `/`
-		"directory": "./public"
+		"not_found_handling": "single-page-application"
 	},
 	"observability": {
 		"enabled": true
