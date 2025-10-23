@@ -1,19 +1,22 @@
 {
-  "name": "flynnmail",
+  "name": "email-worker",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "esbuild src/index.ts --bundle --platform=neutral --outfile=dist/index.mjs --format=esm",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "html-to-text": "^9.0.5",
+    "is-mergeable-object": "^1.1.1",
     "postal-mime": "^2.5.0"
   },
   "devDependencies": {
     "@types/html-to-text": "^9.0.4",
+    "esbuild": "^0.19.0",
     "typescript": "^5.9.3",
     "wrangler": "^4.44.0"
   }
