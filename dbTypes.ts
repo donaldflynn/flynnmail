@@ -5,4 +5,4 @@ type EmailRow = {
     body: string;
     timestamp: number;
 };
-export { EmailRow };
+export type { EmailRow };
