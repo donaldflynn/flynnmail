@@ -16,7 +16,8 @@
 		"@emotion/styled": "^11.14.1",
 		"@mui/material": "^7.3.4",
 		"react": "^19.1.1",
-		"react-dom": "^19.1.1"
+		"react-dom": "^19.1.1",
+		"react-letter": "^0.4.0"
 	},
 	"devDependencies": {
 		"@cloudflare/vite-plugin": "^1.13.15",
