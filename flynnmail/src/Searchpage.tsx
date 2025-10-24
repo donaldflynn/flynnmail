@@ -1,15 +1,21 @@
 import React from "react";
 import { Box, TextField } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 
 
 
 
 export default function SearchPage() {
+
     const [value, setValue] = React.useState("");
+    const navigate = useNavigate();
+
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        console.log(`value is ${value}`);
         e.preventDefault()
+        const inbox = value.trim();
+        if (!inbox) return;
+        navigate(`/inbox/${encodeURIComponent(inbox)}`);
     }
 
 

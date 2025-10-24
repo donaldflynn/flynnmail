@@ -1,17 +1,21 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import cloudflareLogo from './assets/Cloudflare_Logo.svg'
 import './App.css'
+import EmailPage from './EmailPage'
 import SearchPage from './Searchpage'
+import { Route, Routes } from 'react-router-dom'
 
 function App() {
-  const [count, setCount] = useState(0)
-  const [name, setName] = useState('unknown')
-
   return (
-    <SearchPage/>
-    // <>
+    <Routes>
+      <Route path="/" element={<SearchPage />} />
+      <Route path="/inbox/:inbox" element={<EmailPage />} />
+    </Routes>
+  )
+}
+
+export default App
+
+
+  // <>
     //   <div>
     //     <a href='https://vite.dev' target='_blank'>
     //       <img src={viteLogo} className='logo' alt='Vite logo' />
@@ -54,7 +58,3 @@ function App() {
     //     Click on the Vite and React logos to learn more
     //   </p>
     // </>
-  )
-}
-
-export default App
