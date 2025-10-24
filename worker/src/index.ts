@@ -1,6 +1,8 @@
-import PostalMime from "postal-mime";
+import PostalMime, { Address } from "postal-mime";
 import { convert } from "html-to-text";
 import type { D1Database, ExecutionContext } from "@cloudflare/workers-types";
+
+const EMAIL_ENDING = "@dflynn.uk";
 
 type EmailRow = {
     id: string;
@@ -9,6 +11,7 @@ type EmailRow = {
     body: string;
     timestamp: number;
 };
+
 
 type Env = {
   DB: D1Database; // change if your binding name differs
@@ -28,6 +31,18 @@ const parseContent = (text?: string, html?: string): string | null => {
   return body.trim();
 };
 
+const parseToAdress = (address: Address[] | undefined): string => {
+  if (!address || address.length === 0) {
+    throw new Error("No to address found");
+  } else {
+    const mainAddress = address.find((addr) => addr.address?.endsWith(EMAIL_ENDING))?.address;
+    if (!mainAddress) {
+      throw new Error("No valid to address found");
+    }
+    return mainAddress.replace(EMAIL_ENDING, "");
+  }
+}
+
 export default {
   async email(message: any, env: Env, ctx: ExecutionContext) {
     try {
@@ -38,7 +53,7 @@ export default {
 
       // headers: from/to may be arrays or single values
       const fromAdress = email.from?.address ?? "";
-      const toAddress = Array.isArray(email.to) ? (email.to[0]?.address ?? "") : (email.to ?? "");
+      const toAddress = parseToAdress(email.to);
 
       const body = parseContent(email.text, email.html);
       const timestamp = Date.now();
