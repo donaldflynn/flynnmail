@@ -3,8 +3,8 @@ type EmailRow = {
     from_address: string | null;
     from_name: string | null;
     to_address: string;
-    body_text: string;
-    body_html: string;
+    body_text: string | null;
+    body_html: string | null;
     timestamp: number;
     subject: string | null;
 };

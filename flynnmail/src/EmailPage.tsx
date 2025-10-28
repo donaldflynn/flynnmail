@@ -11,6 +11,7 @@ import Paper from '@mui/material/Paper';
 import Searchbar from "./components/Searchbar";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import { Letter } from "react-letter";
 
 function timeAgo(timestamp: number): string {
   const seconds = Math.floor((Date.now() - timestamp) / 1000);
@@ -58,9 +59,11 @@ function Row(props: { row: EmailRow }) {
           <Typography variant="h6" sx={{ margin: 2, whiteSpace: "pre-wrap" }}>
             {row.from_address}
           </Typography>
-          <Typography variant="body2" sx={{ margin: 2, whiteSpace: "pre-wrap" }}>
-            {row.body_html}
-          </Typography>
+          {(row.body_html !== null && row.body_text !== null)? <Letter html={row.body_html} text={row.body_text} />
+          : <Typography variant="body1" sx={{ margin: 2, whiteSpace: "pre-wrap" }}>
+              {row.body_text ?? "(No content)"}
+            </Typography>
+          } 
           </Collapse>
         </TableCell>
       </TableRow>
