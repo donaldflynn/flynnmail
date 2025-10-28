@@ -1,6 +1,7 @@
 type EmailRow = {
     id: string;
-    from_address: string;
+    from_address: string | null;
+    from_name: string | null;
     to_address: string;
     body: string;
     timestamp: number;

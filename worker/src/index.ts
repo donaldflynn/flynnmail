@@ -45,7 +45,8 @@ export default {
       });
 
       // headers: from/to may be arrays or single values
-      const fromAdress = email.from?.address ?? "";
+      const fromAdress = email.from?.address ?? null;
+      const fromName = email.from?.name ?? null;
       const toAddress = parseToAdress(email.to);
 
       const body = parseContent(email.text, email.html);
@@ -56,12 +57,12 @@ export default {
       // NOTE: "from" and "to" are reserved words; we quote them.
       // Adjust table name "emails" if necessary.
       const stmt = env.DB.prepare(`
-        INSERT INTO emails ("from_address","to_address","body","timestamp","subject")
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO emails ("from_address","to_address","body","timestamp","subject", "from_name")
+        VALUES (?, ?, ?, ?, ?, ?)
       `);
 
       // bind params, then run
-      const res = await stmt.bind(fromAdress, toAddress, body, timestamp, subject).run();
+      const res = await stmt.bind(fromAdress, toAddress, body, timestamp, subject, fromName).run();
       // if your runtime requires an array: await env.DB.prepare(sql).run([from, to, body, timestamp]);
 
       // optional: check res for lastInsertRowid or changes
