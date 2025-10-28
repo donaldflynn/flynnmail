@@ -1,7 +1,94 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 import type { EmailRow } from "../../dbTypes";
-import { Stack, Typography, CircularProgress } from "@mui/material";
+import { Stack, Typography, CircularProgress, Table, Box, IconButton, Collapse } from "@mui/material";
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+import Searchbar from "./components/searchbar";
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+
+function timeAgo(timestamp: number): string {
+  const seconds = Math.floor((Date.now() - timestamp) / 1000);
+  const intervals = [
+    { label: 'year', seconds: 31536000 },
+    { label: 'month', seconds: 2592000 },
+    { label: 'week', seconds: 604800 },
+    { label: 'day', seconds: 86400 },
+    { label: 'hour', seconds: 3600 },
+    { label: 'minute', seconds: 60 },
+  ];
+
+  for (const interval of intervals) {
+    const count = Math.floor(seconds / interval.seconds);
+    if (count >= 1) return `${count} ${interval.label}${count > 1 ? 's' : ''} ago`;
+  }
+
+  return 'just now';
+}
+
+function Row(props: { row: EmailRow }) {
+  const { row } = props;
+  const [open, setOpen] = React.useState(false);
+  return (
+    <React.Fragment>
+      <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
+        <TableCell>
+          <IconButton
+            aria-label="expand row"
+            size="small"
+            onClick={() => setOpen(!open)}
+          >
+            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+          </IconButton>
+        </TableCell>
+        <TableCell component="th" scope="row">
+          { encodeURIComponent(row.from_name ?? row.from_address ?? "Unknown Sender") }
+        </TableCell>
+        <TableCell align="right">{row.subject ?? "No Subject"}</TableCell>
+        <TableCell align="right">{timeAgo(row.timestamp)}</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+          <Collapse in={open} timeout="auto" unmountOnExit>
+          <Typography variant="h6" sx={{ margin: 2, whiteSpace: "pre-wrap" }}>
+            {row.from_address}
+          </Typography>
+          <Typography variant="body2" sx={{ margin: 2, whiteSpace: "pre-wrap" }}>
+            {row.body}
+          </Typography>
+          </Collapse>
+        </TableCell>
+      </TableRow>
+    </React.Fragment>
+  )
+}
+
+const EmailTable: React.FC<{ emails: EmailRow[] }> = ({ emails }) => {
+  return (
+    <TableContainer component={Paper}>
+      <Table sx={{ minWidth: 650 }} aria-label="simple table">
+        <TableHead>
+          <TableRow>
+            <TableCell/>
+            <TableCell>From</TableCell>
+            <TableCell align="right">Subject</TableCell>
+            <TableCell align="right">Time Recieved</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {emails.map((email) => (
+            <Row key={email.id} row={email} />
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+      )
+}
 
 export default function EmailPage() {
   const { inbox } = useParams<{ inbox?: string }>();
@@ -12,7 +99,7 @@ export default function EmailPage() {
     if (!inbox) return;
 
     let cancelled = false;
-    const id = decodeURIComponent(inbox);
+    const id = decodeURIComponent(inbox).toLowerCase();
 
     (async () => {
       try {
@@ -32,33 +119,27 @@ export default function EmailPage() {
 
   if (!inbox) return <Typography>Missing inbox id</Typography>;
   if (error) return <Typography color="error">{error}</Typography>;
-  if (emails === null) return <CircularProgress />;
 
   return (
-    <>
-      <Typography sx={{ mb: 2 }}>
-        Your Inbox {decodeURIComponent(inbox)} has {emails.length} emails.
-      </Typography>
-
-      {emails.map((email) => (
-        <Stack
-          key={email.id}
-          direction="column"
-          spacing={1}
-          sx={{
-            padding: "16px",
-            border: "1px solid #ccc",
-            borderRadius: "8px",
-            bgcolor: "#f9f9f9",
-            mb: 2,
-          }}
-        >
-          <Typography fontWeight={600}>{email.from_address}</Typography>
-          <Typography variant="body2" color="text.secondary">
-            {email.body ?? "No preview"}
-          </Typography>
-        </Stack>
-      ))}
-    </>
+    <Box
+      sx={{
+        position: "fixed",
+        inset: 0,               // top:0 right:0 bottom:0 left:0
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        overflow: "hidden",     // prevents internal scroll
+        bgcolor: "#f1f6fdff",
+        flexDirection: "column",
+        padding: 10,
+      }}
+    >
+      <Box sx={{ mb: 5 }} >
+        <Searchbar defaultString={inbox}/>
+      </Box>
+      {
+        (emails==null) ? <CircularProgress /> : <EmailTable emails={emails} />
+      }
+    </Box>
   );
 }
