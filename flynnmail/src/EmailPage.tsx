@@ -53,7 +53,7 @@ export default function EmailPage() {
             mb: 2,
           }}
         >
-          <Typography fontWeight={600}>{email.from}</Typography>
+          <Typography fontWeight={600}>{email.from_address}</Typography>
           <Typography variant="body2" color="text.secondary">
             {email.body ?? "No preview"}
           </Typography>

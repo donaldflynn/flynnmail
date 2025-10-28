@@ -4,13 +4,6 @@ import type { D1Database, ExecutionContext } from "@cloudflare/workers-types";
 
 const EMAIL_ENDING = "@dflynn.uk";
 
-type EmailRow = {
-    id: string;
-    from: string;
-    to: string;
-    body: string;
-    timestamp: number;
-};
 
 
 type Env = {
@@ -57,17 +50,18 @@ export default {
 
       const body = parseContent(email.text, email.html);
       const timestamp = Date.now();
+      const subject = email.subject ?? null;
 
       // Insert into D1.
       // NOTE: "from" and "to" are reserved words; we quote them.
       // Adjust table name "emails" if necessary.
       const stmt = env.DB.prepare(`
-        INSERT INTO emails ("from","to","body","timestamp")
-        VALUES (?, ?, ?, ?)
+        INSERT INTO emails ("from_address","to_address","body","timestamp","subject")
+        VALUES (?, ?, ?, ?, ?)
       `);
 
       // bind params, then run
-      const res = await stmt.bind(fromAdress, toAddress, body, timestamp).run();
+      const res = await stmt.bind(fromAdress, toAddress, body, timestamp, subject).run();
       // if your runtime requires an array: await env.DB.prepare(sql).run([from, to, body, timestamp]);
 
       // optional: check res for lastInsertRowid or changes

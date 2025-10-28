@@ -9,7 +9,7 @@ export default {
     const url = new URL(request.url);
     if (url.pathname.startsWith("/api/inbox/")) {
       const inbox = url.pathname.replace("/api/inbox/", "");
-      const emails = await env.DB.prepare('SELECT * FROM emails WHERE emails."to" = ? ORDER BY timestamp DESC')
+      const emails = await env.DB.prepare('SELECT * FROM emails WHERE emails.to_address = ? ORDER BY timestamp DESC')
         .bind(inbox).all() as { results: EmailRow[] };
       return Response.json(emails.results);
     }
