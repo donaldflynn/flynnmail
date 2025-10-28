@@ -59,7 +59,7 @@ function Row(props: { row: EmailRow }) {
             {row.from_address}
           </Typography>
           <Typography variant="body2" sx={{ margin: 2, whiteSpace: "pre-wrap" }}>
-            {row.body}
+            {row.body_html}
           </Typography>
           </Collapse>
         </TableCell>

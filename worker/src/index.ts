@@ -9,21 +9,6 @@ const EMAIL_ENDING = "@dflynn.uk";
 type Env = {
   DB: D1Database; // change if your binding name differs
 };
-
-const parseContent = (text?: string, html?: string): string | null => {
-  // Extract body (prefer plain text, fallback to HTML conversion)
-  let body = text;
-  if (!body && html) {
-    body = convert(html);
-  }
-
-  if (!body) {
-    return null;
-  }
-
-  return body.trim();
-};
-
 const parseToAdress = (address: Address[] | undefined): string => {
   if (!address || address.length === 0) {
     throw new Error("No to address found");
@@ -48,8 +33,8 @@ export default {
       const fromAdress = email.from?.address ?? null;
       const fromName = email.from?.name?.trim() || null;
       const toAddress = parseToAdress(email.to);
-
-      const body = parseContent(email.text, email.html);
+      const bodyText = email.text?.trim() || null;
+      const bodyHtml = email.html?.trim() || null;
       const timestamp = Date.now();
       const subject = email.subject ?? null;
 
@@ -57,12 +42,12 @@ export default {
       // NOTE: "from" and "to" are reserved words; we quote them.
       // Adjust table name "emails" if necessary.
       const stmt = env.DB.prepare(`
-        INSERT INTO emails ("from_address","to_address","body","timestamp","subject", "from_name")
-        VALUES (?, ?, ?, ?, ?, ?)
+        INSERT INTO emails ("from_address","from_name","to_address","body_text", "body_html","timestamp","subject",
+        VALUES (?, ?, ?, ?, ?, ?, ?)
       `);
 
       // bind params, then run
-      const res = await stmt.bind(fromAdress, toAddress, body, timestamp, subject, fromName).run();
+      const res = await stmt.bind(fromAdress, fromName,toAddress, bodyText, bodyHtml, timestamp, subject).run();
       // if your runtime requires an array: await env.DB.prepare(sql).run([from, to, body, timestamp]);
 
       // optional: check res for lastInsertRowid or changes
