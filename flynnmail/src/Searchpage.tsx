@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import Searchbar from "./components/searchbar";
+import Searchbar from "./components/Searchbar";
 
 
 

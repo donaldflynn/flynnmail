@@ -1,14 +1,14 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 import type { EmailRow } from "../../dbTypes";
-import { Stack, Typography, CircularProgress, Table, Box, IconButton, Collapse } from "@mui/material";
+import { Typography, CircularProgress, Table, Box, IconButton, Collapse } from "@mui/material";
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import Searchbar from "./components/searchbar";
+import Searchbar from "./components/Searchbar";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
@@ -47,7 +47,7 @@ function Row(props: { row: EmailRow }) {
           </IconButton>
         </TableCell>
         <TableCell component="th" scope="row">
-          { encodeURIComponent(row.from_name ?? row.from_address ?? "Unknown Sender") }
+          { row.from_name ?? row.from_address ?? "Unknown Sender" }
         </TableCell>
         <TableCell align="right">{row.subject ?? "No Subject"}</TableCell>
         <TableCell align="right">{timeAgo(row.timestamp)}</TableCell>
