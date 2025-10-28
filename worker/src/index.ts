@@ -46,7 +46,7 @@ export default {
 
       // headers: from/to may be arrays or single values
       const fromAdress = email.from?.address ?? null;
-      const fromName = email.from?.name ?? null;
+      const fromName = email.from?.name?.trim() || null;
       const toAddress = parseToAdress(email.to);
 
       const body = parseContent(email.text, email.html);
