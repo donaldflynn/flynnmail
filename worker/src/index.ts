@@ -42,7 +42,7 @@ export default {
       // NOTE: "from" and "to" are reserved words; we quote them.
       // Adjust table name "emails" if necessary.
       const stmt = env.DB.prepare(`
-        INSERT INTO emails ("from_address","from_name","to_address","body_text", "body_html","timestamp","subject",
+        INSERT INTO emails ("from_address","from_name","to_address","body_text", "body_html","timestamp","subject")
         VALUES (?, ?, ?, ?, ?, ?, ?)
       `);
 
