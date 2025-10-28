@@ -32,7 +32,7 @@ const parseToAdress = (address: Address[] | undefined): string => {
     if (!mainAddress) {
       throw new Error("No valid to address found");
     }
-    return mainAddress.replace(EMAIL_ENDING, "");
+    return mainAddress.replace(EMAIL_ENDING, "").toLowerCase();
   }
 }
 
