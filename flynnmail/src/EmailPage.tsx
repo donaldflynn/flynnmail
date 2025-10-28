@@ -138,7 +138,7 @@ export default function EmailPage() {
       }}
     >
       <Box sx={{ mb: 5 }} >
-        <Searchbar defaultString={inbox}/>
+        <Searchbar defaultString={inbox} autoFocus={false}/>
       </Box>
       {
         (emails==null) ? <CircularProgress /> : <EmailTable emails={emails} />

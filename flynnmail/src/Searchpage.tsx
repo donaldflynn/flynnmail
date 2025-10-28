@@ -18,7 +18,7 @@ export default function SearchPage() {
         bgcolor: "#f1f6fdff",
       }}
     >
-      <Searchbar />
+      <Searchbar autoFocus={true} />
     </Box>
   );
 }

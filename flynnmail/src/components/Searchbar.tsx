@@ -2,7 +2,7 @@ import { Box, TextField } from "@mui/material";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-const Searchbar: React.FC<{defaultString?: string}> = ({defaultString}) => {
+const Searchbar: React.FC<{defaultString?: string, autoFocus?: boolean}> = ({defaultString, autoFocus}) => {
     const [value, setValue] = React.useState(defaultString || "");
     const navigate = useNavigate();
 
@@ -16,6 +16,7 @@ const Searchbar: React.FC<{defaultString?: string}> = ({defaultString}) => {
             <Box component="form" autoComplete="off" sx={{ width: "75vw", maxWidth: "1000" }} onSubmit={handleSubmit}>
             {/* <input type="text" name="prevent_autofill" autoComplete="off" style={{ display: "none" }} /> */}
                 <TextField
+                autoFocus={autoFocus !== false}
                 fullWidth
                 placeholder="Open Mailbox"
                 variant="outlined"
