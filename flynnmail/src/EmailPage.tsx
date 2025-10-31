@@ -59,11 +59,12 @@ function Row(props: { row: EmailRow }) {
           <Typography variant="h6" sx={{ margin: 2, whiteSpace: "pre-wrap" }}>
             {row.from_address}
           </Typography>
-          {(row.body_html !== null && row.body_text !== null)? <Letter html={row.body_html} text={row.body_text} />
+          {row.body_html !== null? <Letter text={row.body_text ?? undefined} html={row.body_html}/>
           : <Typography variant="body1" sx={{ margin: 2, whiteSpace: "pre-wrap" }}>
-              {row.body_text ?? "(No content)"}
-            </Typography>
-          } 
+            {row.body_text ?? "(No content)"}
+          </Typography>
+        }
+          
           </Collapse>
         </TableCell>
       </TableRow>
